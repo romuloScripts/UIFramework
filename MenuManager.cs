@@ -25,7 +25,7 @@ namespace UIFramework {
 		void Awake(){
 			if(menus.Count<=0 || createOnAwake)
 				CreateMenu();
-			cursorManager.ApplySettings();
+			cursorManager?.ApplySettings();
 			Init();
 		}
 
