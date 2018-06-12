@@ -15,6 +15,7 @@ public class LoadScene : MonoBehaviour {
 	void Start(){
 		if(button)
 			button.onClick.AddListener(Load);
+			
 	}
 
 	void Reset(){

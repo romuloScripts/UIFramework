@@ -15,8 +15,6 @@ namespace UIFramework {
 		[Tooltip("Destroy current menus gameobjects and add prefabs again")]
 		public bool createOnAwake = false;
 
-		public CursorManager cursorManager;
-
 		public List<Menu> menus;
 
 
@@ -25,7 +23,6 @@ namespace UIFramework {
 		void Awake(){
 			if(menus.Count<=0 || createOnAwake)
 				CreateMenu();
-			cursorManager?.ApplySettings();
 			Init();
 		}
 
@@ -116,12 +113,13 @@ namespace UIFramework {
 			if(m) menuEditor = m;
 			if(menuEditor == null && menus[0] != null)
 				menuEditor = menus[0];
-			foreach (var item in menus) {
+			foreach (Menu item in menus) {
 				if(item == null) continue;
 				if(item.Equals(menuEditor)){
-					item.Enable();
-				}else{
-					item.Disable();
+					if(!item.gameObject.activeSelf)
+						item.gameObject.SetActive(true);
+				}else if(item.gameObject.activeSelf){
+					item.gameObject.SetActive(false);
 					EditorUtility.SetDirty(item.gameObject);
 				}
 			}
