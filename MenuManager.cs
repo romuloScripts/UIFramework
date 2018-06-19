@@ -45,6 +45,14 @@ namespace UIFramework {
 			gameObject.SetActive(false);
 		}
 
+		public void ActiveMenuSolo(Menu menu){
+			foreach (var item in menus){
+				if(item.gameObject.activeSelf)
+					item.Disable();
+			}
+			menu.Enable();
+		}
+
 /* 		IEnumerator Start2() {
 			yield return new WaitForSecondsRealtime(0.01f);
 			gameObject.SetActive(false);
