@@ -44,7 +44,7 @@ namespace UIFramework {
 			if(notDeselectMouse){
 				NotSelected();
 			}
-			if(menuUnderneath && Input.GetButtonUp(keyClose)){
+			if(menuUnderneath && !string.IsNullOrEmpty(keyClose) && Input.GetButtonUp(keyClose)){
 				Close();
 			}
 		}
