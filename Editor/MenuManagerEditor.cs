@@ -8,12 +8,12 @@ namespace UIFramework {
 
 		string[] buttonsNames;
 
-		private MenuManager m;
+//		private MenuManager m;
 
 		public override void OnInspectorGUI (){
-			m = (MenuManager)target;
+//			m = (MenuManager)target;
 			base.OnInspectorGUI ();
-			if(m.menuTemplate){
+			/* if(m.menuTemplate){
 				GUILayout.BeginHorizontal();
 				if(GUILayout.Button("Create Menu")){
 					m.CreateMenu();
@@ -22,7 +22,7 @@ namespace UIFramework {
 					m.ApplyPrefabs();
 				}
 				GUILayout.EndHorizontal();
-			}
+			} */
 		}
 	}	
 }

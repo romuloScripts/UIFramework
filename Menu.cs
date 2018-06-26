@@ -7,19 +7,35 @@ using UnityEngine;
 namespace UIFramework {
 	public class Menu : MonoBehaviour {
 
+		public BaseRaycaster raycaster;
 		public GameObject firstSelected;
 		public bool remenberLastSelection;
+		public bool destroyWhenClosed;
+		public bool hideUnderneath=true;
 		public bool notDeselectMouse=true;
 
+		public string keyClose="Cancel";
+		public Button closeTransition;
 		public List<Transition> transitions= new List<Transition>();
+
 		public UnityEvent onEnter,onEntered,onLeave,onLeft;
 
 		private GameObject lastButton;
+		private Menu menuUnderneath;
+		private MenuManager manager;
+
+		public void Open(MenuManager manager, Menu underneathMenu){
+			this.manager = manager;
+			manager.AddMenu(this);
+			menuUnderneath = underneathMenu;
+			underneathMenu?.Disable(hideUnderneath);
+			Enable();
+		}
 
 		private void Start() {
+			closeTransition?.onClick.AddListener(Close);
 			foreach (var item in transitions){
-				item.button.onClick.AddListener(Disable);
-				item.button.onClick.AddListener(item.EnableMenu);
+				item.button.onClick.AddListener(()=>item.OpenMenu(manager,this));
 			}
 			lastButton = firstSelected;
 		}
@@ -27,6 +43,9 @@ namespace UIFramework {
 		private void Update() {
 			if(notDeselectMouse){
 				NotSelected();
+			}
+			if(menuUnderneath && Input.GetButtonUp(keyClose)){
+				Close();
 			}
 		}
 
@@ -39,60 +58,69 @@ namespace UIFramework {
 			}
 		}
 
-		public void Disable(){
-			if(remenberLastSelection && EventSystem.current){
-				lastButton = EventSystem.current.currentSelectedGameObject;
+		public void Interactable(bool active){
+			enabled = active;
+			if(raycaster)
+				raycaster.enabled = active;
+			SelectButton(active);
+		}
+
+		void SelectButton(bool active){
+			if(EventSystem.current){
+				if(!active){
+					if(remenberLastSelection)
+						lastButton = EventSystem.current.currentSelectedGameObject;
+				}else{
+					if(lastButton && remenberLastSelection){
+						EventSystem.current.SetSelectedGameObject(lastButton);
+					}else if(firstSelected)
+						EventSystem.current.SetSelectedGameObject(firstSelected);
+				}
 			}
-			onLeave.Invoke ();
-			gameObject.SetActive(false);
-			onLeft.Invoke ();
+		}
+
+		public void Disable(bool hide){
+			Interactable(false);
+			onLeave.Invoke();
+			if(hide)
+				gameObject.SetActive(false);
+			onLeft.Invoke();
 		}
 
 		public void Enable(){
 			onEnter.Invoke ();
 			gameObject.SetActive(true);
-			if(EventSystem.current){
-				if(lastButton && remenberLastSelection){
-					EventSystem.current.SetSelectedGameObject(lastButton);
-				}else
-					EventSystem.current.SetSelectedGameObject(firstSelected);
-			}
+			Interactable(true);
 			onEntered.Invoke ();
 		}
 
-		public void LinkTransitions(){
-			//transitions.Clear();
-			/* foreach (var item in template.connections) {
-				Transition t = new Transition();
-				t.LinkTransition(menus,item);
-				//transitions.Add(t);
-			} */
-		}
-
-		/* public void SetFirstButton(){
-			if(!lastButton){
-				EventSystem.current.SetSelectedGameObject(firstSelected);
+		public void Close(){
+			Disable(true);
+			menuUnderneath?.Enable();
+			if(destroyWhenClosed){
+				manager.RemoveMenu(this);
+				Destroy(gameObject);
 			}
-		} */
+		}
 
 		[System.Serializable]
 		public class Transition{
 
 			public Button button;
 			public Menu toMenu;
+			private Menu prefab;
 
-			public void EnableMenu(){
-				toMenu.Enable();
-			}
-
-			public void LinkTransition(List<Menu> menus,Connection data){
-				/* for (int i = 0; i < menus.Count; i++) {
-					if(menus[i].name == data.menuOrigin.name){
-						button = menus[i].transitionButtons[data.buttonOut];
-					}else if(menus[i].name == data.menuTarget.name){
-						toMenu = menus[i];
+			public void OpenMenu(MenuManager manager, Menu menu){
+				if(prefab && !toMenu){
+					toMenu = prefab;
+				}
+				if(toMenu){
+					if(string.IsNullOrEmpty(toMenu.gameObject.scene.name)){
+						prefab = toMenu;
+						toMenu = Instantiate<Menu>(toMenu,manager.transform);
 					}
-				} */
+					toMenu.Open(manager,menu);
+				}
 			}
 		}
 	}	
