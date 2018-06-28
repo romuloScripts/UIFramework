@@ -1,27 +1,26 @@
-﻿#if UNITY_EDITOR
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
 #endif
 namespace UIFramework {
 	[System.Serializable]
 	public class Node:ScriptableObject{
 
-		#if UNITY_EDITOR
 		public string menuName="Menu";
 		public ConnectionPoint inPoint;
 		public List<ConnectionPoint> outPoint = new List<ConnectionPoint>();
 
 		[HideInInspector,SerializeField]
 		public Rect rect;
+
+#if UNITY_EDITOR
 		[HideInInspector]
 		public bool isDragged;
 		[HideInInspector]
 		public bool isSelected;
 
 		private GUIStyle style, defaultNodeStyle, selectedNodeStyle;
-
-
 		private const float width = 150;
 
 		public void Ini(Vector2 position, GUISkin skin){
@@ -73,6 +72,9 @@ namespace UIFramework {
             rectshadow.y += 4;
             GUI.Box(rectshadow, "", skin.customStyles[1]);
 
+			if(style == null){
+				style = skin.box;
+			}
             GUI.Box(rect, "", style);
             skin.textField.alignment = TextAnchor.MiddleCenter;
             menuName = GUI.TextField(new Rect(rect.x + rect.width / 2f - width / 2f, rect.y, width, 20f), menuName, skin.textField);
@@ -168,6 +170,6 @@ namespace UIFramework {
 			AssetDatabase.SaveAssets();
 		}
 
-		#endif
+#endif
 	}
 }

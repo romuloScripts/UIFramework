@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditor;
 using System.IO;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace UIFramework {
 	[CreateAssetMenu(fileName ="UI Flowchart", menuName = "UI Framework/UI Flowchart", order = 0)]
@@ -16,6 +18,7 @@ namespace UIFramework {
 		[HideInInspector,SerializeField]
 		public List<Connection> connections;
 
+#if UNITY_EDITOR
 		public class NodeToMenu{
 			public Menu menu;
 			public List<Button> buttons=new List<Button>();
@@ -25,49 +28,59 @@ namespace UIFramework {
 			}
 		}
 
-		public void CreatePrefabs(bool createPrefabs){
-			if(!menuTemplate || !buttonTemplate) return;
-			CreateMenus(createPrefabs);
-		}
+		public void CreateMenus(bool createPrefabs){
+            if (!menuTemplate || !buttonTemplate) return;
+            List<NodeToMenu> menus = InstantiateMenus();
+            CreateBackConnections(menus);
+            if (createPrefabs){
+                TransformInPrefabs(menus);
+            }else{
+                CreateMenuManager(menus);
+            }
+            CreateConnections(menus);
+            foreach (var nm in menus){
+                EditorUtility.SetDirty(nm.menu);
+            }
+        }
 
-		private void CreateMenus(bool createPrefabs){
-			List<NodeToMenu> menus= new List<NodeToMenu>();
-			foreach (var item in nodes){
-				Menu m = Instantiate<Menu>(menuTemplate);
-				m.name = item.menuName;
-				NodeToMenu nm = new NodeToMenu(m);
-				CreateButtons(nm, item);
-				menus.Add(nm);
-			}
-			CreateBackConnections(menus);
-			if(createPrefabs){
-				foreach (var nm in menus){
-					Menu old = nm.menu;
-					nm.menu = PrefabUtility.CreatePrefab(Path.GetDirectoryName(AssetDatabase.GetAssetPath(this))+"/"+nm.menu.name+".prefab",
-					nm.menu.gameObject,ReplacePrefabOptions.ConnectToPrefab).GetComponent<Menu>();
-					Button[] buttons = nm.menu.GetComponentsInChildren<Button>();
-					nm.menu.destroyWhenClosed = true;
-					for (int i = 0; i < buttons.Length && i< nm.buttons.Count; i++){
-						nm.buttons[i] = buttons[i];
-					}
-					DestroyImmediate(old.gameObject);
-				}
-			}else{
-				GameObject go = new GameObject(name);
-				MenuManager m = go.AddComponent<MenuManager>();
-				foreach (var item in menus){
-					item.menu.destroyWhenClosed = false;
-					m.menus.Add(item.menu);
-					item.menu.transform.SetParent(m.transform,false);
-				}
-			}
-			CreateConnections(menus);
-			foreach (var nm in menus){
-				EditorUtility.SetDirty(nm.menu);
-			}
-		}
+        private void CreateMenuManager(List<NodeToMenu> menus){
+            GameObject go = new GameObject(name);
+            MenuManager m = go.AddComponent<MenuManager>();
+            foreach (var item in menus){
+                item.menu.destroyWhenClosed = false;
+                m.menus.Add(item.menu);
+                item.menu.transform.SetParent(m.transform, false);
+            }
+        }
 
-		private void CreateButtons(NodeToMenu nodeToMenu, Node node){
+        private void TransformInPrefabs(List<NodeToMenu> menus){
+            foreach (var nm in menus){
+                Menu old = nm.menu;
+                nm.menu = PrefabUtility.CreatePrefab(Path.GetDirectoryName(AssetDatabase.GetAssetPath(this)) + "/" + nm.menu.name + ".prefab",
+                nm.menu.gameObject, ReplacePrefabOptions.ConnectToPrefab).GetComponent<Menu>();
+                Button[] buttons = nm.menu.GetComponentsInChildren<Button>();
+                nm.menu.destroyWhenClosed = true;
+                for (int i = 0; i < buttons.Length && i < nm.buttons.Count; i++){
+                    nm.buttons[i] = buttons[i];
+                }
+                DestroyImmediate(old.gameObject);
+            }
+        }
+
+        private List<NodeToMenu> InstantiateMenus(){
+            List<NodeToMenu> menus = new List<NodeToMenu>();
+            foreach (var item in nodes){
+                Menu m = Instantiate<Menu>(menuTemplate);
+                m.name = item.menuName;
+                NodeToMenu nm = new NodeToMenu(m);
+                CreateButtons(nm, item);
+                menus.Add(nm);
+            }
+
+            return menus;
+        }
+
+        private void CreateButtons(NodeToMenu nodeToMenu, Node node){
 			foreach (var item in node.outPoint){
                 Button b = InstantiateButton(nodeToMenu);
 				b.name = item.textName;
@@ -105,5 +118,6 @@ namespace UIFramework {
             b.transform.SetParent(vGroup ? vGroup.transform : nodeToMenu.menu.transform, false);
             return b;
         }
+#endif
 	}
 }

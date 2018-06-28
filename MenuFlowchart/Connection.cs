@@ -14,17 +14,15 @@ namespace UIFramework {
 		public Node menuTarget;
 		public ConnectionPoint buttonOut;
 
+#if UNITY_EDITOR
 		public void Ini(ConnectionPoint buttonOut, Node menuOrigin, Node menuTarget) {
 			this.menuOrigin = menuOrigin;
 			this.menuTarget = menuTarget;
 			this.buttonOut = buttonOut;
 			
-			#if UNITY_EDITOR
 			NodeEditor.RemoveDuplicateConnectionOut (this);
-			#endif
 		}
 
-		#if UNITY_EDITOR
 		public void Draw (MenuDesign menu, GUISkin skin) {
 		
 			if (buttonOut == null || menuOrigin == null || menuTarget == null) {
@@ -67,12 +65,12 @@ namespace UIFramework {
 				shadowrectOut.center - Vector2.left * 50f,			
 				shadowCol, null, NodeEditor.lineWidht*1.5f);
 		}
-		#endif
 
 		public void Remove(List<Connection> connections){
 			connections.Remove(this);
 			DestroyImmediate(this,true);
 			AssetDatabase.SaveAssets();
 		}
+#endif
 	}
 }

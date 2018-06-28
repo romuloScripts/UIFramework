@@ -1,10 +1,12 @@
-﻿#if UNITY_EDITOR
-using System;
+﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace UIFramework {
+
 	public enum ConnectionPointType { In, Out }
 
 	[System.Serializable]
@@ -16,6 +18,7 @@ namespace UIFramework {
 		[HideInInspector]
 		public Rect rect;
 
+#if UNITY_EDITOR
 		public void Ini(ConnectionPointType type){
 			this.type = type;
 		}
@@ -75,6 +78,6 @@ namespace UIFramework {
 			DestroyImmediate(this,true);
 			AssetDatabase.SaveAssets();
 		}
+#endif
     }
 }
-#endif

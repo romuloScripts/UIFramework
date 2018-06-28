@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
- using UnityEditorInternal;
+using UnityEditorInternal;
 
 namespace UIFramework {
 	public class NodeEditor : EditorWindow{
@@ -85,11 +85,11 @@ namespace UIFramework {
 		private void CreateButton(float y){
 			Rect rect = new Rect(5,y,140,20);
 			if(GUI.Button(rect,"Create Menus")){
-				menudesign?.CreatePrefabs(false);
+				menudesign?.CreateMenus(false);
 			}
 			rect.y+=30;
 			if(GUI.Button(rect,"Create Menus Prefabs")){
-				menudesign?.CreatePrefabs(true);
+				menudesign?.CreateMenus(true);
 			}
 		}
 
