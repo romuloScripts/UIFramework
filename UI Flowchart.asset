@@ -1,0 +1,255 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60b7ae2ea7fa8af4aa72a33e1e4af42a, type: 3}
+  m_Name: UI Flowchart
+  m_EditorClassIdentifier: 
+  menuTemplate: {fileID: 114012152087454004, guid: 04eb074fef9e5934aa80a30336052b03,
+    type: 2}
+  buttonTemplate: {fileID: 114596887175293434, guid: 80bff7d8149cb804eaa536214295ac81,
+    type: 2}
+  nodes:
+  - {fileID: 114557235797583808}
+  - {fileID: 114911886426265438}
+  - {fileID: 114091797495182284}
+  connections:
+  - {fileID: 114450208469039176}
+  - {fileID: 114657054553779098}
+--- !u!114 &114046736057967550
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c872ee374a2d49a44a4d2c281f38ffe1, type: 3}
+  m_Name: Button
+  m_EditorClassIdentifier: 
+  textName: Credits
+  type: 1
+  rect:
+    serializedVersion: 2
+    x: 368
+    y: 222
+    width: 20
+    height: 20
+--- !u!114 &114091797495182284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ccfd01b8c28f95479746d1f9192b293, type: 3}
+  m_Name: Menu
+  m_EditorClassIdentifier: 
+  menuName: Credits
+  inPoint: {fileID: 114227769091361824}
+  outPoint: []
+  rect:
+    serializedVersion: 2
+    x: 582
+    y: 261
+    width: 150
+    height: 45
+  isDragged: 0
+  isSelected: 0
+--- !u!114 &114227769091361824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c872ee374a2d49a44a4d2c281f38ffe1, type: 3}
+  m_Name: Open
+  m_EditorClassIdentifier: 
+  textName: Back
+  type: 0
+  rect:
+    serializedVersion: 2
+    x: 570
+    y: 286
+    width: 20
+    height: 20
+--- !u!114 &114242032681700968
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c872ee374a2d49a44a4d2c281f38ffe1, type: 3}
+  m_Name: Open
+  m_EditorClassIdentifier: 
+  textName: Back
+  type: 0
+  rect:
+    serializedVersion: 2
+    x: 571
+    y: 205
+    width: 20
+    height: 20
+--- !u!114 &114450208469039176
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f69f76c6ea171d54a96d4d7b0bed4bdd, type: 3}
+  m_Name: Connection
+  m_EditorClassIdentifier: 
+  menuOrigin: {fileID: 114557235797583808}
+  menuTarget: {fileID: 114091797495182284}
+  buttonOut: {fileID: 114046736057967550}
+--- !u!114 &114557235797583808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ccfd01b8c28f95479746d1f9192b293, type: 3}
+  m_Name: Menu
+  m_EditorClassIdentifier: 
+  menuName: Menu
+  inPoint: {fileID: 114869918131131950}
+  outPoint:
+  - {fileID: 114767840445174714}
+  - {fileID: 114922521085303134}
+  - {fileID: 114046736057967550}
+  - {fileID: 114565084670972260}
+  rect:
+    serializedVersion: 2
+    x: 226
+    y: 142
+    width: 150
+    height: 145
+  isDragged: 0
+  isSelected: 0
+--- !u!114 &114565084670972260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c872ee374a2d49a44a4d2c281f38ffe1, type: 3}
+  m_Name: Button
+  m_EditorClassIdentifier: 
+  textName: Quit
+  type: 1
+  rect:
+    serializedVersion: 2
+    x: 368
+    y: 247
+    width: 20
+    height: 20
+--- !u!114 &114657054553779098
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f69f76c6ea171d54a96d4d7b0bed4bdd, type: 3}
+  m_Name: Connection
+  m_EditorClassIdentifier: 
+  menuOrigin: {fileID: 114557235797583808}
+  menuTarget: {fileID: 114911886426265438}
+  buttonOut: {fileID: 114922521085303134}
+--- !u!114 &114767840445174714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c872ee374a2d49a44a4d2c281f38ffe1, type: 3}
+  m_Name: Button
+  m_EditorClassIdentifier: 
+  textName: Play
+  type: 1
+  rect:
+    serializedVersion: 2
+    x: 368
+    y: 172
+    width: 20
+    height: 20
+--- !u!114 &114869918131131950
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c872ee374a2d49a44a4d2c281f38ffe1, type: 3}
+  m_Name: Open
+  m_EditorClassIdentifier: 
+  textName: Back
+  type: 0
+  rect:
+    serializedVersion: 2
+    x: 214
+    y: 204.5
+    width: 20
+    height: 20
+--- !u!114 &114911886426265438
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2ccfd01b8c28f95479746d1f9192b293, type: 3}
+  m_Name: Menu
+  m_EditorClassIdentifier: 
+  menuName: Options
+  inPoint: {fileID: 114242032681700968}
+  outPoint: []
+  rect:
+    serializedVersion: 2
+    x: 583
+    y: 180
+    width: 150
+    height: 45
+  isDragged: 0
+  isSelected: 0
+--- !u!114 &114922521085303134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c872ee374a2d49a44a4d2c281f38ffe1, type: 3}
+  m_Name: Button
+  m_EditorClassIdentifier: 
+  textName: Options
+  type: 1
+  rect:
+    serializedVersion: 2
+    x: 368
+    y: 197
+    width: 20
+    height: 20

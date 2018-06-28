@@ -5,37 +5,37 @@ using UnityEditor;
 #endif
 namespace UIFramework {
 	[System.Serializable]
-	public class Node{
+	public class Node:ScriptableObject{
 
 		#if UNITY_EDITOR
-		public Menu menu;
-
-		public Rect rect,rect2;
-		public bool isDragged;
-		public bool isSelected;
+		public string menuName="Menu";
 		public ConnectionPoint inPoint;
 		public List<ConnectionPoint> outPoint = new List<ConnectionPoint>();
-		public GUIStyle style, defaultNodeStyle, selectedNodeStyle,styleShadow;
-		public GUISkin skin;
-		public string menuName="Menu";
 
-		private float width = 150;
-		private float height;
+		[HideInInspector,SerializeField]
+		public Rect rect;
+		[HideInInspector]
+		public bool isDragged;
+		[HideInInspector]
+		public bool isSelected;
 
-		public Node(Menu menu, Vector2 position, GUISkin skin){
-			this.menu = menu;
+		private GUIStyle style, defaultNodeStyle, selectedNodeStyle;
 
-			height = 50+(menu.transitions.Count-1)*25;
-			rect = new Rect(position.x, position.y, width, height);
-			inPoint = new ConnectionPoint(ConnectionPointType.In);
-			for (int i = 0; i < menu.transitions.Count; i++) {
-				ConnectionPoint outP = new ConnectionPoint( ConnectionPointType.Out);
-				outPoint.Add(outP);
-			}
-			style = defaultNodeStyle = skin.box;
-			selectedNodeStyle = skin.customStyles[0];
-			this.skin = skin;
-			styleShadow = skin.customStyles[1];
+
+		private const float width = 150;
+
+		public void Ini(Vector2 position, GUISkin skin){
+			rect = new Rect(position.x, position.y, width, 0);
+
+			inPoint = ScriptableObject.CreateInstance<ConnectionPoint>();
+			inPoint.name = "Open";
+			inPoint.textName = "Back";
+			AssetDatabase.AddObjectToAsset(inPoint,NodeEditor.singleton.menudesign);
+			AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(inPoint));
+			inPoint.Ini(ConnectionPointType.In);
+			EditorUtility.SetDirty (NodeEditor.singleton.menudesign);
+
+			style = skin.box;
 		}
 
 		public bool ConnectionOutExists(ConnectionPoint con){
@@ -51,42 +51,49 @@ namespace UIFramework {
 			rect.position += delta;
 		}
 
-		public void Draw(){
-			if(!menu){
-				OnClickRemoveNode();
-				return;
-			}
-			height = 70+(menu.transitions.Count-1)*25;
-			rect.height = height;
-			//Color shadowCol = new Color(0, 0, 0, 0.06f);
-			//for (int i = 0; i < 3; i++){ // Draw a shadow
-			Rect rectshadow = rect;
-			rectshadow.x+=4;
-			rectshadow.y+=4;
-			GUI.Box(rectshadow, "", styleShadow);
-			//}
-			GUI.Box(rect, "", style);
-			skin.textField.alignment = TextAnchor.MiddleCenter;
-			menuName = GUI.TextField(new Rect(rect.x+rect.width/2f-width/2f, rect.y, width, 20f),menuName, skin.textField);
-			inPoint.Draw(this,0,skin);
-			if(menu.transitions.Count > outPoint.Count){
-				for (int i = outPoint.Count-1; i < menu.transitions.Count; i++) {
-					ConnectionPoint outP = new ConnectionPoint(ConnectionPointType.Out);
-					outPoint.Add(outP);
-				}
-			}else if(menu.transitions.Count < outPoint.Count){
-				for (int i = outPoint.Count-1; i > menu.transitions.Count-1; i--) {
-					//				ConnectionPoint outP = new ConnectionPoint( ConnectionPointType.Out, skin);
-					outPoint.RemoveAt(i);
-				}
-			}
-			for (int i = 0; i < outPoint.Count; i++) {
-				outPoint[i].Draw(this,i,skin);
-			}
+		public void Draw(GUISkin skin){
+            UpdateSkinStyles(skin);
+            DrawRect(skin);
+            inPoint.Draw(this, 0, skin);
+            DrawConnectionPoints(skin);
+            AddButton(skin);
+        }
 
+        private void UpdateSkinStyles(GUISkin skin){
+            selectedNodeStyle = skin.customStyles[0];
+            defaultNodeStyle = skin.box;
+        }
+
+        private void DrawRect(GUISkin skin){
+            float height = 70 + (outPoint.Count - 1) * 25;
+            rect.height = height;
+
+            Rect rectshadow = rect;
+            rectshadow.x += 4;
+            rectshadow.y += 4;
+            GUI.Box(rectshadow, "", skin.customStyles[1]);
+
+            GUI.Box(rect, "", style);
+            skin.textField.alignment = TextAnchor.MiddleCenter;
+            menuName = GUI.TextField(new Rect(rect.x + rect.width / 2f - width / 2f, rect.y, width, 20f), menuName, skin.textField);
+        }
+
+        private void DrawConnectionPoints(GUISkin skin){
+            for (int i = 0; i < outPoint.Count; i++){
+                outPoint[i].Draw(this, i, skin);
+            }
+        }
+
+		private void AddButton(GUISkin skin){
 			float btnSize = 30f;
 			if (GUI.Button (new Rect (rect.x+rect.width-20,rect.y+rect.height-20,btnSize,btnSize), "+", skin.customStyles[2])) {
-				
+				ConnectionPoint outP = ScriptableObject.CreateInstance<ConnectionPoint>();
+				outP.name = "Button";
+				AssetDatabase.AddObjectToAsset(outP,NodeEditor.singleton.menudesign);
+				AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(outP));
+				outP.Ini(ConnectionPointType.Out);
+				outPoint.Add(outP);
+				EditorUtility.SetDirty (NodeEditor.singleton.menudesign);
 			}
 		}
 
@@ -142,6 +149,25 @@ namespace UIFramework {
 		private void OnClickRemoveNode(){
 			NodeEditor.RemoveNode(this);
 		}
+
+		public void Remove(List<Node> nodes,List<Connection> connections){
+			if (connections != null){
+				for (int j = connections.Count-1; j >=0; j--){
+					Connection c = connections[j];
+					if (c.menuOrigin == this || c.menuTarget == this){
+						c.Remove(connections);
+					}
+				}
+			}
+			inPoint.Remove(null);
+			for (int j = outPoint.Count-1; j >=0; j--){
+				 outPoint[j].Remove(outPoint);
+			}
+			nodes.Remove(this);
+			DestroyImmediate(this,true);
+			AssetDatabase.SaveAssets();
+		}
+
 		#endif
 	}
 }

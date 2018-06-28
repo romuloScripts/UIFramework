@@ -12,7 +12,7 @@ namespace UIFramework {
 	public class MenuManager : MonoBehaviour {
 
 		public Menu firstMenuPrefab;
-		public List<Menu> menus;
+		public List<Menu> menus= new List<Menu>();
 
 		private Menu menuEditor;
 

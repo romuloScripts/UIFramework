@@ -33,6 +33,7 @@ namespace UIFramework {
 		}
 
 		private void Start() {
+			Debug.Log(gameObject.name);
 			closeTransition?.onClick.AddListener(Close);
 			foreach (var item in transitions){
 				item.button.onClick.AddListener(()=>item.OpenMenu(manager,this));
@@ -103,6 +104,10 @@ namespace UIFramework {
 			}
 		}
 
+		public void AddTransition(Button b, Menu m){
+			transitions.Add(new Transition(b,m));
+		}
+
 		[System.Serializable]
 		public class Transition{
 
@@ -110,12 +115,19 @@ namespace UIFramework {
 			public Menu toMenu;
 			private Menu prefab;
 
+			public Transition(){}
+			public Transition(Button b, Menu m){
+				button = b;
+				toMenu = m;
+			}
+
 			public void OpenMenu(MenuManager manager, Menu menu){
 				if(prefab && !toMenu){
 					toMenu = prefab;
 				}
 				if(toMenu){
 					if(string.IsNullOrEmpty(toMenu.gameObject.scene.name)){
+					//if(toMenu.gameObject.name.Contains("(Clone)")){
 						prefab = toMenu;
 						toMenu = Instantiate<Menu>(toMenu,manager.transform);
 					}

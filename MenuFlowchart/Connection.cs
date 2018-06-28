@@ -1,41 +1,38 @@
 ﻿using System;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace UIFramework {
 	[System.Serializable]
-	public class Connection {
+	public class Connection:ScriptableObject {
 		
-		public Menu menuOrigin;
-		public Menu menuTarget;
-		public GUIStyle style;
-		public int buttonOut;
-		public int nodeOut;
-		public int nodeIn;
+		public Node menuOrigin;
+		public Node menuTarget;
+		public ConnectionPoint buttonOut;
 
-		public Connection (int menuOut, int buttonOut, int menuIn, Menu menuOrigin, Menu menuTarget, GUISkin skin) {
-			
+		public void Ini(ConnectionPoint buttonOut, Node menuOrigin, Node menuTarget) {
 			this.menuOrigin = menuOrigin;
 			this.menuTarget = menuTarget;
-			this.nodeOut = menuOut;
 			this.buttonOut = buttonOut;
-			this.nodeIn = menuIn;
-			this.style = skin.button;
+			
 			#if UNITY_EDITOR
 			NodeEditor.RemoveDuplicateConnectionOut (this);
 			#endif
 		}
+
 		#if UNITY_EDITOR
-		public void Draw (MenuDesign menu) {
+		public void Draw (MenuDesign menu, GUISkin skin) {
 		
-			if (!(menu.nodes.Count > nodeIn) || !(menu.nodes.Count > nodeOut) || !(menu.nodes [nodeOut].outPoint.Count > buttonOut)) {
+			if (buttonOut == null || menuOrigin == null || menuTarget == null) {
 				NodeEditor.RemoveConnection (this);
 				return;
 			}
-			Rect rectIn = menu.nodes [nodeIn].inPoint.rect;
-			Rect rectOut = menu.nodes [nodeOut].outPoint [buttonOut].rect;
+			Rect rectIn = menuTarget.inPoint.rect;
+			Rect rectOut = buttonOut.rect;
 
 			DrawShadow (rectIn, rectOut);
 			Handles.DrawBezier (
@@ -50,10 +47,11 @@ namespace UIFramework {
 		
 			Vector3 btnPos = (rectIn.center + rectOut.center) * 0.5f;
 			float btnSize = 24f;
-			if (GUI.Button (new Rect (btnPos.x - (btnSize * 0.5f), btnPos.y - (btnSize * 0.5f), btnSize, btnSize), "╳", style)) {
+			if (GUI.Button (new Rect (btnPos.x - (btnSize * 0.5f), btnPos.y - (btnSize * 0.5f), btnSize, btnSize), "╳", skin.button)) {
 				NodeEditor.RemoveConnection (this);
 			}
 		}
+
 		private void DrawShadow(Rect shadowrect, Rect shadowrectOut){
 
 			Color shadowCol = new Color(0, 0, 0, 0.3f);
@@ -70,5 +68,11 @@ namespace UIFramework {
 				shadowCol, null, NodeEditor.lineWidht*1.5f);
 		}
 		#endif
+
+		public void Remove(List<Connection> connections){
+			connections.Remove(this);
+			DestroyImmediate(this,true);
+			AssetDatabase.SaveAssets();
+		}
 	}
 }

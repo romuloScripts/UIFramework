@@ -1,10 +1,13 @@
 fileFormatVersion: 2
 guid: 60b7ae2ea7fa8af4aa72a33e1e4af42a
-timeCreated: 1488994460
-licenseType: Free
 MonoImporter:
+  externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - menuTemplate: {fileID: 114012152087454004, guid: 04eb074fef9e5934aa80a30336052b03,
+      type: 2}
+  - buttonTemplate: {fileID: 114596887175293434, guid: 80bff7d8149cb804eaa536214295ac81,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

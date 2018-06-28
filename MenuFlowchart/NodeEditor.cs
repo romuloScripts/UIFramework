@@ -25,10 +25,10 @@ namespace UIFramework {
 		private ReorderableList list;
 		private Vector2 scrollOffset;
 
-		public  static void OpenWindow(MenuDesign m){
+		public static void OpenWindow(MenuDesign m){
 			NodeEditor window = GetWindow<NodeEditor>();
 			window.menudesign = m;
-			window.titleContent = new GUIContent("Node Editor");
+			window.titleContent = new GUIContent(m.name);
 			window.OnEnable();
 			if(singleton){
 				singleton.OnDrag(-singleton.offset);
@@ -38,7 +38,7 @@ namespace UIFramework {
 
 		private void OnEnable(){
 			singleton = this;
-			SetList();
+			serializedObject = new SerializedObject(menudesign);
 		}
 
 		private void OnGUI(){
@@ -49,8 +49,7 @@ namespace UIFramework {
 			DrawNodes();
 			DrawConnections();
 			DrawConnectionLine(Event.current);
-			DrawList();
-
+			DrawMenus();
 			ProcessNodeEvents(Event.current);
 			ProcessEvents(Event.current);
 			// if (GUI.changed) 
@@ -58,39 +57,40 @@ namespace UIFramework {
 
 		}
 
-		private void SetList(){
-			if(!menudesign) return;
-			serializedObject = new SerializedObject(menudesign);
-			list = new ReorderableList(serializedObject, 
-                serializedObject.FindProperty("menuPrefabs"), 
-               true, true, true, true); 
-			list.drawHeaderCallback = (Rect rect) => {  
-    			EditorGUI.LabelField(rect, "Menu Prefabs");
-			};
-			list.drawElementCallback =  (Rect rect, int index, bool isActive, bool isFocused) => {
-    			var element = list.serializedProperty.GetArrayElementAtIndex(index);
-    			rect.y += 2;
-    			EditorGUI.PropertyField(
-        			new Rect(rect.x, rect.y, 160, EditorGUIUtility.singleLineHeight),
-        			element, GUIContent.none);
-  			};
+		private void DrawMenus(){
+
+
+			SerializedProperty menu = serializedObject.FindProperty("menuTemplate");
+			SerializedProperty button = serializedObject.FindProperty("buttonTemplate");
+			
+			float width = 150;
+			float height = 150;
+			Rect rect = new Rect(position.width-width,0,width,height);
+			GUI.BeginGroup(rect,"");
+				rect = new Rect(0,0,width,height);
+				GUI.Box(rect,"",skin.customStyles[1]);
+				rect = new Rect(5,0,width-5,15);
+				EditorGUI.LabelField(rect,"Menu Template");
+				rect.y += 20;
+				EditorGUI.PropertyField(rect,menu, GUIContent.none);
+				rect.y += 20;
+				EditorGUI.LabelField(rect,"Button Template");
+				rect.y += 20;
+				EditorGUI.PropertyField(rect, button,GUIContent.none);
+				serializedObject.ApplyModifiedProperties();
+				CreateButton(rect.y+30);
+			GUI.EndGroup();
 		}
 
-		private void DrawList(){
-			serializedObject.Update();
-			
-			Rect listRect = position;
-			listRect.y = 0;
-			float width = 200;
-			listRect.x = position.width-width;
-			listRect.width = width;
-
-			GUILayout.BeginArea(listRect);
-			scrollOffset = EditorGUILayout.BeginScrollView(scrollOffset,false,false);
-        	list.DoLayoutList();
-			EditorGUILayout.EndScrollView();
-			GUILayout.EndArea();
-        	serializedObject.ApplyModifiedProperties();
+		private void CreateButton(float y){
+			Rect rect = new Rect(5,y,140,20);
+			if(GUI.Button(rect,"Create Menus")){
+				menudesign?.CreatePrefabs(false);
+			}
+			rect.y+=30;
+			if(GUI.Button(rect,"Create Menus Prefabs")){
+				menudesign?.CreatePrefabs(true);
+			}
 		}
 
 		private void DrawGrid(float gridSpacing, float gridOpacity, Color gridColor){
@@ -118,7 +118,7 @@ namespace UIFramework {
 		private void DrawNodes(){
 			if (menudesign.nodes != null){
 				for (int i = 0; i < menudesign.nodes.Count; i++){
-					menudesign.nodes[i].Draw();
+					menudesign.nodes[i].Draw(skin);
 				}
 			}
 		}
@@ -126,7 +126,7 @@ namespace UIFramework {
 		private void DrawConnections(){
 			if (menudesign.connections != null){
 				for (int i = 0; i < menudesign.connections.Count; i++){
-					menudesign.connections[i].Draw(menudesign);
+					menudesign.connections[i].Draw(menudesign,skin);
 				} 
 			}
 		}
@@ -199,10 +199,7 @@ namespace UIFramework {
 
 		private void ProcessContextMenu(Vector2 mousePosition){
 			GenericMenu genericMenu = new GenericMenu();
-			foreach (var item in menudesign.menuPrefabs) {
-				if(item != null)
-					genericMenu.AddItem(new GUIContent(item.name), false, () => OnClickAddNode(mousePosition,item)); 	
-			}
+			genericMenu.AddItem(new GUIContent("Add Menu"), false, () => OnClickAddNode(mousePosition,null));
 			genericMenu.AddItem(new GUIContent("Remove All Nodes"), false, () => RemoveAllNodes()); 	
 			genericMenu.ShowAsContext();
 		}
@@ -215,7 +212,6 @@ namespace UIFramework {
 					menudesign.nodes[i].Drag(delta);
 				}
 			}
-
 			GUI.changed = true;
 		}
 
@@ -229,7 +225,12 @@ namespace UIFramework {
 			if (menudesign.nodes == null){
 				menudesign.nodes = new List<Node>();
 			}
-			menudesign.nodes.Add(new Node(menu, mousePosition, skin));
+			Node n = ScriptableObject.CreateInstance<Node>();
+			n.name = "Menu";
+			AssetDatabase.AddObjectToAsset(n,menudesign);
+			AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(n));
+			n.Ini(mousePosition,skin);
+			menudesign.nodes.Add(n);
 			EditorUtility.SetDirty (menudesign);
 		}
 
@@ -285,12 +286,11 @@ namespace UIFramework {
 			if (menudesign.connections == null){
 				menudesign.connections = new List<Connection>();
 			}
-			int menuOut=0, menuIn=0,buttonOut = 0;
+			int menuOut=0, menuIn=0;
 			for (int i = 0; i < menudesign.nodes.Count; i++) {
 				for (int j = 0; j < menudesign.nodes[i].outPoint.Count; j++) {
 					if(menudesign.nodes[i].outPoint[j] == selectedOutPoint){
 						menuOut = i;
-						buttonOut = j;
 						break;
 					}
 				}	
@@ -301,7 +301,12 @@ namespace UIFramework {
 					break;
 				}
 			}
-			menudesign.connections.Add(new Connection(menuOut,buttonOut,menuIn,menudesign.nodes[menuOut].menu,menudesign.nodes[menuIn].menu, skin));
+			Connection c = ScriptableObject.CreateInstance<Connection>();
+			c.name = "Connection";
+			AssetDatabase.AddObjectToAsset(c,menudesign);
+			AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(c));
+			c.Ini(selectedOutPoint,menudesign.nodes[menuOut],menudesign.nodes[menuIn]);
+			menudesign.connections.Add(c);
 			EditorUtility.SetDirty (menudesign);
 		}
 
@@ -312,22 +317,28 @@ namespace UIFramework {
 
 		public static void RemoveConnection(Connection connection){
 			if (singleton && singleton.menudesign) {
-				singleton.menudesign.connections.Remove (connection);
+				connection.Remove(singleton.menudesign.connections);
 				EditorUtility.SetDirty (singleton.menudesign);
 			}
 		}
 
 		public static void RemoveNode(Node node){
-			if (singleton && singleton.menudesign) {
-				singleton.menudesign.RemoveNode (node);
+			if (singleton && singleton.menudesign){
+				node.Remove(singleton.menudesign.nodes,singleton.menudesign.connections);
 				EditorUtility.SetDirty (singleton.menudesign);
 			}
 		}
 
 		private void RemoveAllNodes(){
 			if(menudesign){
-				menudesign.nodes.Clear();
-				menudesign.connections.Clear();
+				for (int j = menudesign.nodes.Count-1; j >=0; j--){
+					menudesign.nodes[j].Remove(menudesign.nodes,menudesign.connections);
+				}
+				Object[] objs = AssetDatabase.LoadAllAssetRepresentationsAtPath(AssetDatabase.GetAssetPath(menudesign));
+				for (int i = objs.Length-1; i >=0; i--){
+					DestroyImmediate(objs[i],true);
+				}
+				AssetDatabase.ImportAsset(AssetDatabase.GetAssetPath(menudesign));
 				EditorUtility.SetDirty(menudesign);
 			}
 		}
@@ -335,7 +346,8 @@ namespace UIFramework {
 		public static void RemoveDuplicateConnectionOut(Connection connection){
 			if(!(singleton && singleton.menudesign)) return;
 			for (int i = 0; i < singleton.menudesign.connections.Count; i++) {
-				if(singleton.menudesign.nodes[connection.nodeOut].menu == singleton.menudesign.nodes[singleton.menudesign.connections[i].nodeOut].menu && connection.buttonOut == singleton.menudesign.connections[i].buttonOut){
+				if(connection.menuTarget== singleton.menudesign.connections[i].menuTarget 
+				&& connection.buttonOut == singleton.menudesign.connections[i].buttonOut){
 					RemoveConnection(singleton.menudesign.connections[i]);
 					return;
 				}
