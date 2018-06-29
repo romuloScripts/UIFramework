@@ -33,7 +33,6 @@ namespace UIFramework {
 		}
 
 		private void Start() {
-			Debug.Log(gameObject.name);
 			closeTransition?.onClick.AddListener(Close);
 			foreach (var item in transitions){
 				item.button.onClick.AddListener(()=>item.OpenMenu(manager,this));
