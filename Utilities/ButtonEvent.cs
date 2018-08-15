@@ -16,7 +16,7 @@ public class ButtonEvent : MonoBehaviour {
 	}
 
 	void Update () {
-		if(Input.GetButtonDown(nomeBotao)){
+		if(Input.GetButtonUp(nomeBotao)){
 			
 			onPressionar.Invoke();
 			if(b){
