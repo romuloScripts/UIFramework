@@ -42,4 +42,17 @@ public class LoadScene : MonoBehaviour {
 		yield return new WaitForSecondsRealtime(delay);
 		SceneManager.LoadScene(name);
 	}
+
+	public void Load(int index){
+		onLoadScene.Invoke();
+		if(delay >0)
+			StartCoroutine(LoadDelay(index));
+		else
+			SceneManager.LoadScene(index);
+	}
+
+	IEnumerator LoadDelay(int index){
+		yield return new WaitForSecondsRealtime(delay);
+		SceneManager.LoadScene(index);
+	}
 }
