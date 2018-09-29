@@ -55,4 +55,13 @@ public class LoadScene : MonoBehaviour {
 		yield return new WaitForSecondsRealtime(delay);
 		SceneManager.LoadScene(index);
 	}
+
+	public void LoadNext(){ 
+		onLoadScene.Invoke(); 
+		int index = SceneManager.GetActiveScene().buildIndex +1; 
+		if(delay >0) 
+			StartCoroutine(LoadDelay(index)); 
+		else 
+			SceneManager.LoadScene(index); 
+	}
 }
