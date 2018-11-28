@@ -38,7 +38,8 @@ namespace UIFramework {
 
 		private void OnEnable(){
 			singleton = this;
-			serializedObject = new SerializedObject(menudesign);
+			if(menudesign)
+				serializedObject = new SerializedObject(menudesign);
 		}
 
 		private void OnGUI(){
@@ -58,7 +59,6 @@ namespace UIFramework {
 		}
 
 		private void DrawMenus(){
-
 
 			SerializedProperty menu = serializedObject.FindProperty("menuTemplate");
 			SerializedProperty button = serializedObject.FindProperty("buttonTemplate");

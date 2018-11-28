@@ -11,6 +11,7 @@ using UnityEditor;
 namespace UIFramework {
 	public class MenuManager : MonoBehaviour {
 
+		public bool onAwake= true;
 		public Menu firstMenuPrefab;
 		public List<Menu> menus= new List<Menu>();
 
@@ -26,12 +27,19 @@ namespace UIFramework {
 			}
 		}
 
-		void Awake(){
-			EventSystem.current.SetSelectedGameObject(null);
-			Openfirst();
-		}
+		void Awake()
+        {
+			if (onAwake)
+            	Initiate();
+        }
 
-		void Openfirst(){
+        public void Initiate()
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+            Openfirst();
+        }
+
+        void Openfirst(){
 			DisableAll();
 			if(menus.Count<=0 && firstMenuPrefab){
 				menus.Add(Instantiate<Menu>(firstMenuPrefab,transform));
