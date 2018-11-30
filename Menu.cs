@@ -9,6 +9,7 @@ namespace UIFramework {
 
 		public BaseRaycaster raycaster;
 		public GameObject firstSelected;
+		public bool waitAnimationEnd;
 		public bool remenberLastSelection;
 		public bool destroyWhenClosed;
 		public bool hideUnderneath=true;
@@ -78,29 +79,67 @@ namespace UIFramework {
 				}
 			}
 		}
+		
+		public void Enable()
+		{
+			OnEnter();
+			if(!waitAnimationEnd)
+				OnEntered();
+		}
 
-		public void Disable(bool hide){
+		public void Disable(bool hide)
+		{
+			OnLeave();
+			onLeft.AddListener(() => SetHide(hide));
+			if(!waitAnimationEnd)
+				OnLeft();
+		}
+		
+		private void OnEnter()
+		{
+			gameObject.SetActive(true);
+			onEnter.Invoke();
+		}
+
+		public void OnEntered()
+		{
+			onEntered.Invoke();
+			Interactable(true);
+		}
+		
+		private void OnLeave()
+		{
 			Interactable(false);
 			onLeave.Invoke();
-			if(hide)
-				gameObject.SetActive(false);
+		}
+
+		public void OnLeft()
+		{
 			onLeft.Invoke();
 		}
 
-		public void Enable(){
-			onEnter.Invoke ();
-			gameObject.SetActive(true);
-			Interactable(true);
-			onEntered.Invoke ();
+		private void SetHide(bool hide)
+		{
+			if (hide)
+				gameObject.SetActive(false);
+			onLeft.RemoveListener(() => SetHide(hide));
 		}
 
-		public void Close(){
+		public void Close()
+		{
+			onLeft.AddListener(DestroyIfClosed);
 			Disable(true);
 			menuUnderneath?.Enable();
-			if(destroyWhenClosed){
+		}
+
+		private void DestroyIfClosed()
+		{
+			if (destroyWhenClosed)
+			{
 				manager.RemoveMenu(this);
 				Destroy(gameObject);
 			}
+			onLeft.RemoveListener(DestroyIfClosed);
 		}
 
 		public void AddTransition(Button b, Menu m){

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
-public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandler {
+public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandler{//, IPointerEnterHandler {
 
 	public bool submit=true,move,useSelectAudio;
 	public bool verticalMove;
@@ -36,4 +36,9 @@ public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandl
 		else
 			AudioButton.sSelect();
 	}
+
+	/*public void OnPointerEnter(PointerEventData eventData)
+	{
+		AudioButton.sSelect();
+	}*/
 }
