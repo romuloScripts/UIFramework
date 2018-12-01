@@ -1,24 +1,36 @@
-﻿using UnityEngine.EventSystems;
+﻿using System;
+using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine;
 
 namespace UIFramework {
-	public class Menu : MonoBehaviour {
 
+	public interface IMenuComponent
+	{
+		bool Initialize { get; }
+		void Ini();
+	}
+
+	public class Menu : MonoBehaviour {
+		
+		[Foldout("Behaviour",true)]
 		public BaseRaycaster raycaster;
 		public GameObject firstSelected;
-		public bool waitAnimationEnd;
+		public bool waitEnterAnimationEnd, waitLeaveAnimationEnd;
 		public bool remenberLastSelection;
 		public bool destroyWhenClosed;
 		public bool hideUnderneath=true;
 		public bool notDeselectMouse=true;
 
+		[Foldout("Transitions",true)]
 		public string keyClose="Cancel";
 		public Button closeTransition;
 		public List<Transition> transitions= new List<Transition>();
-
+		
+		[Foldout("Events",true)]
 		public UnityEvent onEnter,onEntered,onLeave,onLeft;
 
 		private GameObject lastButton;
@@ -83,7 +95,7 @@ namespace UIFramework {
 		public void Enable()
 		{
 			OnEnter();
-			if(!waitAnimationEnd)
+			if(!waitEnterAnimationEnd)
 				OnEntered();
 		}
 
@@ -91,7 +103,7 @@ namespace UIFramework {
 		{
 			OnLeave();
 			onLeft.AddListener(() => SetHide(hide));
-			if(!waitAnimationEnd)
+			if(!waitLeaveAnimationEnd)
 				OnLeft();
 		}
 		
@@ -120,9 +132,9 @@ namespace UIFramework {
 
 		private void SetHide(bool hide)
 		{
+			onLeft.RemoveListener(() => SetHide(hide));
 			if (hide)
 				gameObject.SetActive(false);
-			onLeft.RemoveListener(() => SetHide(hide));
 		}
 
 		public void Close()
@@ -134,16 +146,24 @@ namespace UIFramework {
 
 		private void DestroyIfClosed()
 		{
+			onLeft.RemoveListener(DestroyIfClosed);
 			if (destroyWhenClosed)
 			{
 				manager.RemoveMenu(this);
 				Destroy(gameObject);
 			}
-			onLeft.RemoveListener(DestroyIfClosed);
 		}
 
 		public void AddTransition(Button b, Menu m){
 			transitions.Add(new Transition(b,m));
+		}
+
+		public void InitializeComponents()
+		{
+			foreach (var component in GetComponents<IMenuComponent>())
+			{
+				component.Ini();
+			}
 		}
 
 		[System.Serializable]
@@ -168,6 +188,7 @@ namespace UIFramework {
 					//if(toMenu.gameObject.name.Contains("(Clone)")){
 						prefab = toMenu;
 						toMenu = Instantiate<Menu>(toMenu,manager.transform);
+						toMenu.InitializeComponents();
 					}
 					toMenu.Open(manager,menu);
 				}

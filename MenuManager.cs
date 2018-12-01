@@ -41,8 +41,11 @@ namespace UIFramework {
 
         void Openfirst(){
 			DisableAll();
-			if(menus.Count<=0 && firstMenuPrefab){
-				menus.Add(Instantiate<Menu>(firstMenuPrefab,transform));
+			if(menus.Count<=0 && firstMenuPrefab)
+			{
+				Menu menu = Instantiate<Menu>(firstMenuPrefab, transform);
+				menu.InitializeComponents();
+				menus.Add(menu);
 			}
 			menus[0].Open(this,null);	
 		}
