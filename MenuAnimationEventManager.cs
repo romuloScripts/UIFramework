@@ -57,8 +57,9 @@ public class MenuAnimationEventManager : GameEventListenerBase, IMenuComponent
 	{
 		if (gameEvent == OnEntered)
 		{
-			_menu.OnEntered();
 			_menu.SetActiveGO(true);
+			_menu.OnEntered();
+			
 		}
 		else if(gameEvent == OnLeft)
 		{

@@ -36,6 +36,7 @@ namespace UIFramework {
 		private GameObject lastButton;
 		private Menu menuUnderneath;
 		private MenuManager manager;
+		private Action leftActions;
 
 		public void Open(MenuManager manager, Menu underneathMenu){
 			this.manager = manager;
@@ -94,6 +95,7 @@ namespace UIFramework {
 		
 		public void Enable()
 		{
+			leftActions = null;
 			OnEnter();
 			if(!waitEnterAnimationEnd)
 				OnEntered();
@@ -101,8 +103,9 @@ namespace UIFramework {
 
 		public void Disable(bool hide)
 		{
+			leftActions += () => SetHide(hide);
 			OnLeave();
-			onLeft.AddListener(() => SetHide(hide));
+			//onLeft.AddListener(() => SetHide(hide));
 			if(!waitLeaveAnimationEnd)
 				OnLeft();
 		}
@@ -128,25 +131,28 @@ namespace UIFramework {
 		public void OnLeft()
 		{
 			onLeft.Invoke();
+			leftActions?.Invoke();
+			leftActions = null;
 		}
 
 		private void SetHide(bool hide)
 		{
-			onLeft.RemoveListener(() => SetHide(hide));
+			//onLeft.RemoveListener(() => SetHide(hide));
 			if (hide)
 				gameObject.SetActive(false);
 		}
 
 		public void Close()
 		{
-			onLeft.AddListener(DestroyIfClosed);
+			//onLeft.AddListener(DestroyIfClosed);
+			leftActions += DestroyIfClosed;
 			Disable(true);
 			menuUnderneath?.Enable();
 		}
 
 		private void DestroyIfClosed()
 		{
-			onLeft.RemoveListener(DestroyIfClosed);
+			//onLeft.RemoveListener(DestroyIfClosed);
 			if (destroyWhenClosed)
 			{
 				manager.RemoveMenu(this);
