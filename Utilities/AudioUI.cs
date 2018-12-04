@@ -4,14 +4,16 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 
-public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandler{//, IPointerEnterHandler {
+public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandler, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler{
 
 	public bool submit=true,move,useSelectAudio;
 	public bool verticalMove;
+	public bool UseMousePointer;
 	public UnityEvent onSubmit;
 
 	public void OnSelect (BaseEventData eventData){
-		AudioButton.sSelect();
+		if(EventSystem.current.currentSelectedGameObject != gameObject)
+			AudioButton.sSelect();
 	}
 
 	public void OnSubmit(BaseEventData eventData){
@@ -19,6 +21,7 @@ public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandl
 	}
 
 	public void Submit(){
+		Debug.Log(name);
 		if(!submit) return;
 		onSubmit.Invoke();
 		if(!useSelectAudio)
@@ -37,8 +40,25 @@ public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandl
 			AudioButton.sSelect();
 	}
 
-	/*public void OnPointerEnter(PointerEventData eventData)
+	public void OnPointerEnter(PointerEventData eventData)
 	{
-		AudioButton.sSelect();
-	}*/
+		if(UseMousePointer)
+			ExecuteEvents.Execute(gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.selectHandler);
+	}
+
+	public void OnPointerExit(PointerEventData eventData)
+	{
+		if(UseMousePointer)
+			ExecuteEvents.Execute(gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.deselectHandler);
+	}
+
+	public void OnPointerClick(PointerEventData eventData)
+	{
+		if (UseMousePointer)
+		{
+			ExecuteEvents.Execute(gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
+			if (!gameObject.activeSelf)
+				Submit();
+		}
+	}
 }

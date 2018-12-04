@@ -24,6 +24,12 @@ namespace UIFramework {
 		public bool destroyWhenClosed;
 		public bool hideUnderneath=true;
 		public bool notDeselectMouse=true;
+		public bool skipEvents;
+		public bool SkipEvents
+		{
+			//get { return skipEvents; }
+			set { skipEvents = value; }
+		}
 
 		[Foldout("Transitions",true)]
 		public string keyClose="Cancel";
@@ -31,26 +37,34 @@ namespace UIFramework {
 		public List<Transition> transitions= new List<Transition>();
 		
 		[Foldout("Events",true)]
-		public UnityEvent onEnter,onEntered,onLeave,onLeft;
+		public UnityEvent onEnter,onEntered,onLeave,onLeft,onSkipEnter;
 
 		private GameObject lastButton;
 		private Menu menuUnderneath;
 		private MenuManager manager;
 		private Action leftActions;
+		private bool CreatedTransitions;
 
 		public void Open(MenuManager manager, Menu underneathMenu){
 			this.manager = manager;
 			manager.AddMenu(this);
+			if(!CreatedTransitions)
+				SetTransitions();
 			menuUnderneath = underneathMenu;
 			underneathMenu?.Disable(hideUnderneath);
 			Enable();
+			
 		}
 
-		private void Start() {
+		public void SetTransitions()
+		{
+			CreatedTransitions = true;
 			closeTransition?.onClick.AddListener(Close);
-			foreach (var item in transitions){
-				item.button.onClick.AddListener(()=>item.OpenMenu(manager,this));
+			foreach (var item in transitions)
+			{
+				item.button.onClick.AddListener(() => item.OpenMenu(manager, this));
 			}
+
 			lastButton = firstSelected;
 		}
 
@@ -95,6 +109,13 @@ namespace UIFramework {
 		
 		public void Enable()
 		{
+			if (skipEvents)
+			{
+				gameObject.SetActive(true);
+				Interactable(true);
+				onSkipEnter.Invoke();
+				return;
+			}
 			leftActions = null;
 			OnEnter();
 			if(!waitEnterAnimationEnd)
@@ -103,6 +124,15 @@ namespace UIFramework {
 
 		public void Disable(bool hide)
 		{
+			if (skipEvents)
+			{
+				Interactable(false);
+				SetHide(hide);
+				leftActions?.Invoke();
+				leftActions = null;
+				skipEvents = false;
+				return;
+			}
 			leftActions += () => SetHide(hide);
 			OnLeave();
 			//onLeft.AddListener(() => SetHide(hide));
@@ -170,6 +200,17 @@ namespace UIFramework {
 			{
 				component.Ini();
 			}
+		}
+		
+		public void InstantiateAndOpenMenu(Menu menu){
+			menu = Instantiate<Menu>(menu,manager.transform);
+			menu.InitializeComponents();
+			menu.Open(manager,this);
+		}
+
+		public void ClickButton(Button b)
+		{
+			b.onClick.Invoke();
 		}
 
 		[System.Serializable]

@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 #if UNITY_EDITOR
@@ -14,6 +15,7 @@ namespace UIFramework {
 		public bool onAwake= true;
 		public Menu firstMenuPrefab;
 		public List<Menu> menus= new List<Menu>();
+		public UnityEvent onInitialize;
 
 		private Menu menuEditor;
 
@@ -35,6 +37,7 @@ namespace UIFramework {
 
         public void Initiate()
         {
+	        onInitialize.Invoke();
             EventSystem.current.SetSelectedGameObject(null);
             Openfirst();
         }

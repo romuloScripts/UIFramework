@@ -16,13 +16,19 @@ public class ButtonEvent : MonoBehaviour {
 	}
 
 	void Update () {
-		if(Input.GetButtonUp(nomeBotao)){
-			
-			onPressionar.Invoke();
-			if(b){
-				//b.onClick.Invoke();
-				ExecuteEvents.Execute(b.gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
-			}
+		if(Input.GetButtonUp(nomeBotao))
+		{
+			OnPress();
 		}		
+	}
+
+	public void OnPress()
+	{
+		onPressionar.Invoke();
+		if (b)
+		{
+			//b.onClick.Invoke();
+			ExecuteEvents.Execute(b.gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
+		}
 	}
 }
