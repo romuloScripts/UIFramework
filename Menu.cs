@@ -53,7 +53,6 @@ namespace UIFramework {
 			menuUnderneath = underneathMenu;
 			underneathMenu?.Disable(hideUnderneath);
 			Enable();
-			
 		}
 
 		public void SetTransitions()
@@ -212,6 +211,12 @@ namespace UIFramework {
 		{
 			b.onClick.Invoke();
 		}
+		
+		public Menu ClickButton(int i, bool skip)
+		{
+			transitions[i].OpenMenu(manager,this,skip);
+			return transitions[i].toMenu;
+		}
 
 		[System.Serializable]
 		public class Transition{
@@ -226,7 +231,7 @@ namespace UIFramework {
 				toMenu = m;
 			}
 
-			public void OpenMenu(MenuManager manager, Menu menu){
+			public void OpenMenu(MenuManager manager, Menu menu, bool skip=false){
 				if(prefab && !toMenu){
 					toMenu = prefab;
 				}
@@ -237,6 +242,7 @@ namespace UIFramework {
 						toMenu = Instantiate<Menu>(toMenu,manager.transform);
 						toMenu.InitializeComponents();
 					}
+					toMenu.skipEvents = skip;
 					toMenu.Open(manager,menu);
 				}
 			}

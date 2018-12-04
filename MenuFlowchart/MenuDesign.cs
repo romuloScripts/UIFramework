@@ -7,7 +7,7 @@ using UnityEditor;
 #endif
 
 namespace UIFramework {
-	[CreateAssetMenu(fileName ="UI Flowchart", menuName = "UI Framework/UI Flowchart", order = 0)]
+	[CreateAssetMenu(fileName ="UI Flowchart", menuName = "Menu/UI Flowchart", order = 0)]
 	public class MenuDesign : ScriptableObject {
 
 		public Menu menuTemplate;

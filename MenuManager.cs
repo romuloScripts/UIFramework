@@ -37,12 +37,63 @@ namespace UIFramework {
 
         public void Initiate()
         {
-	        onInitialize.Invoke();
-            EventSystem.current.SetSelectedGameObject(null);
-            Openfirst();
+	        Ini();
         }
 
-        void Openfirst(){
+		private void Ini(bool openFirst=true)
+		{
+			onInitialize.Invoke();
+			EventSystem.current.SetSelectedGameObject(null);
+			Openfirst(openFirst);
+		}
+
+
+		public void InitiateAndJumpTo(Menu menu)
+		{
+			List<int> idTransitions = new List<int>();
+			Ini(false);
+			bool result = SearchMenu(menus[0], menu, idTransitions);
+			if (result && idTransitions.Count>0)
+			{
+				Menu m = menus[0];
+				m.skipEvents = true;
+				m.Open(this,null);
+				for (int i = idTransitions.Count-1; i >=0; i--)
+				{
+					m = m.ClickButton(idTransitions[i],idTransitions.Count >1);
+					idTransitions.RemoveAt(i);
+				}
+			}
+			else
+			{
+				menus[0].Open(this,null);	
+			}
+		}
+
+		private bool SearchMenu(Menu menu, Menu toMenu, List<int> idTransitions)
+		{
+			if (menu == toMenu)
+			{
+				return true;
+			}
+			if (menu.transitions.Count > 0)
+			{
+				int i = 0;
+				bool result = false;
+				do
+				{
+					result = SearchMenu(menu.transitions[i].toMenu, toMenu,idTransitions);
+					if(!result)
+						i++;
+				} while (i<menu.transitions.Count && !result);
+				if(result)
+					idTransitions.Add(i);
+				return result;
+			}
+			return false;
+		}
+
+		void Openfirst(bool open=true){
 			DisableAll();
 			if(menus.Count<=0 && firstMenuPrefab)
 			{
