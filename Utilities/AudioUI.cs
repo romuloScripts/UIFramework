@@ -21,7 +21,6 @@ public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandl
 	}
 
 	public void Submit(){
-		Debug.Log(name);
 		if(!submit) return;
 		onSubmit.Invoke();
 		if(!useSelectAudio)
@@ -56,8 +55,8 @@ public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandl
 	{
 		if (UseMousePointer)
 		{
-			ExecuteEvents.Execute(gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
-			if (!gameObject.activeSelf)
+			//ExecuteEvents.Execute(gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
+			//if (!gameObject.activeSelf)
 				Submit();
 		}
 	}
