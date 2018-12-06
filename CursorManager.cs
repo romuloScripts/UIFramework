@@ -7,6 +7,7 @@ public class CursorManager : MonoBehaviour {
     public bool showCursor,onAwake;
     public Texture2D texture;
     public Vector2 hotspot = new Vector2(16, 16);
+	public CursorLockMode CursorLockMode = CursorLockMode.None; 
 
     void Awake(){
         if(onAwake)
@@ -14,8 +15,8 @@ public class CursorManager : MonoBehaviour {
     }
 
 	public void ApplySettings(){
-		Debug.Log(name);
 		Cursor.SetCursor(texture, hotspot, CursorMode.Auto);
         Cursor.visible = showCursor;
+		Cursor.lockState = CursorLockMode;
 	}
 }

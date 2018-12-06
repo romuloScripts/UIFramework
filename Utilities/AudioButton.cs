@@ -13,7 +13,7 @@ public class AudioButton : MonoBehaviour {
 		if(singleton){
 			return;
 		}
-		transform.parent = null;
+		transform.SetParent(null,false);
 		AudioListener.pause = false;
 		singleton = this;
 		audioSource.ignoreListenerPause=true;
