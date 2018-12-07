@@ -12,7 +12,7 @@ public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandl
 	public UnityEvent onSubmit;
 
 	public void OnSelect (BaseEventData eventData){
-		if(EventSystem.current.currentSelectedGameObject != gameObject)
+		if(EventSystem.current && EventSystem.current.currentSelectedGameObject != gameObject)
 			AudioButton.sSelect();
 	}
 
