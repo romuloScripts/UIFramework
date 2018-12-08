@@ -41,13 +41,13 @@ public class AudioUI : MonoBehaviour, ISelectHandler, ISubmitHandler, IMoveHandl
 
 	public void OnPointerEnter(PointerEventData eventData)
 	{
-		if(UseMousePointer)
+		if(UseMousePointer && EventSystem.current)
 			ExecuteEvents.Execute(gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.selectHandler);
 	}
 
 	public void OnPointerExit(PointerEventData eventData)
 	{
-		if(UseMousePointer)
+		if(UseMousePointer && EventSystem.current)
 			ExecuteEvents.Execute(gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.deselectHandler);
 	}
 
