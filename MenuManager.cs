@@ -43,7 +43,7 @@ namespace UIFramework {
 		private void Ini(bool openFirst=true)
 		{
 			onInitialize.Invoke();
-			EventSystem.current.SetSelectedGameObject(null);
+			EventSystem.current?.SetSelectedGameObject(null);
 			Openfirst(openFirst);
 		}
 
