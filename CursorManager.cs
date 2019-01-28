@@ -7,9 +7,9 @@ public class CursorManager : MonoBehaviour {
     public bool showCursor,onAwake;
     public Texture2D texture;
     public Vector2 hotspot = new Vector2(16, 16);
-	public CursorLockMode CursorLockMode = CursorLockMode.None; 
+	public CursorLockMode CursorLockMode = CursorLockMode.None;
 
-    void Awake(){
+	private void Awake(){
         if(onAwake)
             ApplySettings();
     }
